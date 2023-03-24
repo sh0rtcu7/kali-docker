@@ -1,0 +1,32 @@
+services:
+  kali:
+    image: localkali
+    hostname: kali
+    build:
+      context: ./kali
+      args:
+        ROOT_PASSWORD: "inseretgoodpasswordhere"
+    volumes:
+      - ./kalihome:/root:rw
+      - ./hashes:/root/hashes:rw
+      - ./wordlists:/root/wordlists:rw 
+    ports:
+      - 22:22
+  hashcat:
+    image: localhashcat
+    hostname: hashcat
+    build:
+      context: ./hashcat
+      args:
+        ROOT_PASSWORD: "inseretgoodpasswordhere"
+    volumes:
+      - ./hashes:/root/hashes:rw
+      - ./wordlists:/root/wordlists:rw
+    # https://docs.docker.com/compose/gpu-support/
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
